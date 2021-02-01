@@ -1,0 +1,49 @@
+### Basic case
+POST {{endpoint}}/people
+Content-Type: application/json
+
+{
+  "id": 42,
+  "gender": "M",
+  "isoCountry": "svn",
+  "testResult": "P",
+  "intervention": "quarantine",
+  "birthDate": "23.06.1953",
+  "testDate": "31.12.2020"
+}
+
+### No info
+POST {{endpoint}}/people
+Content-Type: application/json
+
+{
+  "id": 42,
+  "gender": "M",
+  "isoCountry": "svn",
+  "testResult": "P",
+  "intervention": "-",
+  "birthDate": "23.06.1953",
+  "testDate": "31.12.2020"
+}
+
+### Get person with specific ID
+GET {{endpoint}}/people/42
+Content-Type: application/json
+
+### Delete user with specific ID
+DELETE {{endpoint}}/people/42
+Content-Type: application/json
+
+### Updating record
+PATCH {{endpoint}}/people/42
+Content-Type: application/json
+
+{
+  "id": 42,
+  "gender": "M",
+  "isoCountry": "svn",
+  "testResult": "P",
+  "intervention": "-",
+  "birthDate": "23.06.1953",
+  "testDate": "31.12.2020"
+}
