@@ -1,7 +1,9 @@
 # cp-finder
 
 Ultra-fast search and analytics engine purposely built for
-[Žejn GROUP - Codemania (TL - Hack) - hackathon, January 2021](https://www.zejn.si/).
+[Žejn GROUP](https://www.zejn.si/)
+
+- [Codemania (TL - Hack) - hackathon, January 2021](https://tl-hack.incubatehub.com/p/codemania-tl-hack).
 
 Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 
@@ -73,7 +75,7 @@ GET http://127.0.0.1:8080/analytics/positive
 
 ```json
 {
-  "count": 14
+  "count": 5457
 }
 ```
 
@@ -85,8 +87,8 @@ GET http://127.0.0.1:8080/analytics/positiveByGender
 
 ```json
 {
-  "female": 3,
-  "male": 11
+  "female": 2779,
+  "male": 2678
 }
 ```
 
@@ -98,11 +100,15 @@ GET http://127.0.0.1:8080/analytics/positiveByGenderAndState
 
 ```json
 {
-  "male": {
-    "quarantine": 11
-  },
   "female": {
-    "hospitalized": 1
+    "hospitalized": 919,
+    "medical care": 865,
+    "quarantine": 995
+  },
+  "male": {
+    "hospitalized": 898,
+    "medical care": 916,
+    "quarantine": 864
   }
 }
 ```
@@ -116,11 +122,57 @@ GET http://127.0.0.1:8080/analytics/positiveByDates
 ```json
 {
   "dates": {
-    "1.01.2021": 200,
-    "5.01.2021": 200,
-    "12.01.2021": 600
-  }
-}
+    "8.12.2020": 20,
+    "9.01.2021": 12,
+    "9.03.2020": 14,
+    "9.04.2020": 18,
+    "9.05.2020": 20,
+    "9.06.2020": 14,
+    "9.07.2020": 15,
+    "9.08.2020": 14,
+    "9.09.2020": 16,
+    "9.10.2020": 19,
+    "9.11.2020": 12,
+    "9.12.2020": 14
+    ...
+```
+
+##### Number of positive cases by date\*
+
+This endpoint is to be used for following requirements:
+
+- The number of positive cases by date for all data.
+- Filtering subset of countries and return the number of total cases for all the countries
+- Endpoint groups results per country
+
+```http request
+GET http://127.0.0.1:8080/analytics/positiveByCountryAndDates
+```
+
+```json
+{
+  "countries": {
+    "aus": {
+      "1.03.2020": 3,
+      "2.03.2020": 3,
+      "3.03.2020": 3,
+      "4.03.2020": 9,
+      "5.03.2020": 5,
+      "6.03.2020": 2,
+      "7.03.2020": 9,
+      "8.03.2020": 4,
+      "9.03.2020": 2,
+      "10.03.2020": 6,
+      "11.03.2020": 5,
+      "12.03.2020": 6,
+      "13.03.2020": 1,
+      ...
+```
+
+With the help of `country` query parameters the results can be further filtered.
+
+```http request
+GET http://127.0.0.1:8080/analytics/positiveByCountryAndDates?country=svn&country=aus
 ```
 
 ## Development 🏗
@@ -149,6 +201,14 @@ $ sbt run
 To run the full testsuite including integration tests please run
 
 $ sbt test
+
+### Tooling
+
+To populate the service with seed data from CSV the script [bin/feed-csv.rb](bin/feed-csv.rb) can be used like so:
+
+```bash
+./bin/feed-csv.rb data/covidPeople.csv
+```
 
 ## Author
 

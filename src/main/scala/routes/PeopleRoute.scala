@@ -2,22 +2,23 @@ package com.pinkstack
 package routes
 
 import Domain.{DeletePerson, GetPerson}
+import actors.PeopleActor
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import akka.util.Timeout
-import com.pinkstack.actors.PeopleActor
 
 import scala.concurrent.duration._
 
 class PeopleRoute(people: ActorRef)
                  (implicit system: ActorSystem) {
 
+  import Serialisation.LocalDateSerde._
+
   import Directives._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import io.circe.generic.auto._
-  import Serialisation.LocalDateSerde._
 
   implicit val timeout: Timeout = 1.second
 

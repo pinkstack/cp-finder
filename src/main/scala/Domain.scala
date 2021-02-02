@@ -71,7 +71,6 @@ object Domain {
     val identity: Person = Person(0, 'M', LocalDate.now(), "svn", LocalDate.now(), "N", "-")
   }
 
-
   sealed trait AggregateResult
 
   case class PositiveCases(count: Int) extends AggregateResult
@@ -83,6 +82,8 @@ object Domain {
 
   case class PositiveCasesByDates(dates: SortedMap[LocalDate, Int] = SortedMap.empty) extends AggregateResult
 
+  case class PositiveCasesByCountryAndDates(countries: Map[String, SortedMap[LocalDate, Int]] = Map.empty) extends AggregateResult
+
   sealed trait FetchAggregate
 
   case object FetchPositiveCases extends FetchAggregate
@@ -92,5 +93,7 @@ object Domain {
   case object FetchPositiveCasesByGenderAndState extends FetchAggregate
 
   case object FetchPositiveCasesByDates extends FetchAggregate
+
+  case object FetchPositiveCasesByCountryAndDates extends FetchAggregate
 
 }

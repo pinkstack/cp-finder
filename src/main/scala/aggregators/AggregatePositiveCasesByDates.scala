@@ -20,3 +20,4 @@ object AggregatePositiveCasesByDates {
       .to(Sink.foreach(wrap => callback(wrap)))
   }
 }
+

@@ -1,7 +1,7 @@
 package com.pinkstack
 package actors
 
-import aggregators.{AggregatePositive, AggregatePositiveByGender, AggregatePositiveCasesByDates, AggregatePositiveCasesByGenderAndState}
+import aggregators.{AggregatePositive, AggregatePositiveByGender, AggregatePositiveCasesByCountryAndDates, AggregatePositiveCasesByDates, AggregatePositiveCasesByGenderAndState}
 
 import akka.NotUsed
 import akka.actor._
@@ -24,8 +24,9 @@ class AggregateActor extends Actor with ActorLogging {
   var aggregatedPositiveCasesByGender: PositiveCasesByGender = PositiveCasesByGender(0, 0)
   var aggregatedPositiveCasesByGenderAndState: PositiveCasesByGenderAndState = PositiveCasesByGenderAndState()
   var aggregatedPositiveCasesByDates: PositiveCasesByDates = PositiveCasesByDates()
+  var aggregatedPositiveCasesByCountryAndDates: PositiveCasesByCountryAndDates = PositiveCasesByCountryAndDates()
 
-  context.system.scheduler.scheduleWithFixedDelay(0.seconds, 3.seconds, self, Tick)
+  context.system.scheduler.scheduleWithFixedDelay(0.seconds, 5.seconds, self, Tick)
 
   def receive: Receive = {
     case Tick =>
@@ -43,6 +44,9 @@ class AggregateActor extends Actor with ActorLogging {
     case Aggregated(result: PositiveCasesByDates) =>
       aggregatedPositiveCasesByDates = result
 
+    case Aggregated(result: PositiveCasesByCountryAndDates) =>
+      aggregatedPositiveCasesByCountryAndDates = result
+
     case GetAggregate(FetchPositiveCases) =>
       sender() ! aggregatedPositiveCases
 
@@ -54,6 +58,9 @@ class AggregateActor extends Actor with ActorLogging {
 
     case GetAggregate(FetchPositiveCasesByDates) =>
       sender() ! aggregatedPositiveCasesByDates
+
+    case GetAggregate(FetchPositiveCasesByCountryAndDates) =>
+      sender() ! aggregatedPositiveCasesByCountryAndDates
   }
 
   private[this] val queries: LeveldbReadJournal = PersistenceQuery(context.system)
@@ -86,6 +93,7 @@ class AggregateActor extends Actor with ActorLogging {
       .alsoTo(AggregatePositiveByGender.apply(self ! Aggregated(_)))
       .alsoTo(AggregatePositiveCasesByGenderAndState.apply(self ! Aggregated(_)))
       .alsoTo(AggregatePositiveCasesByDates.apply(self ! Aggregated(_)))
+      .alsoTo(AggregatePositiveCasesByCountryAndDates.apply(self ! Aggregated(_)))
       .runWith(Sink.ignore)
   }
 

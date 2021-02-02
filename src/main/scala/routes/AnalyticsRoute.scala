@@ -20,6 +20,7 @@ class AnalyticsRoute(aggregateActor: ActorRef)(implicit system: ActorSystem) {
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import io.circe.generic.auto._
   import Serialisation.LocalDateSerde._
+  import system.dispatcher
 
   implicit val timeout: Timeout = 2.second
 
@@ -30,10 +31,27 @@ class AnalyticsRoute(aggregateActor: ActorRef)(implicit system: ActorSystem) {
         path("positiveByGender")(complete(fetchAggregate[PositiveCasesByGender](FetchPositiveCasesByGender))),
         path("positiveByGenderAndState")(complete(fetchAggregate[PositiveCasesByGenderAndState](FetchPositiveCasesByGenderAndState))),
         path("positiveByDates")(complete(fetchAggregate[PositiveCasesByDates](FetchPositiveCasesByDates))),
+        path("positiveByCountryAndDates") {
+          parameter(Symbol("country").as[String].*) { countries: Iterable[String] => complete(filterCountries(countries)) }
+        }
       )
     )))
 
   private[this] def fetchAggregate[T: ClassTag](aggregate: Domain.FetchAggregate): Future[T] = {
     (aggregateActor ? AggregateActor.GetAggregate(aggregate)).mapTo[T]
+  }
+
+  /**
+   * Returns all countries with all the dates. The endpoint supports filtering.
+   *
+   * @param countries
+   * @return
+   */
+  private[this] def filterCountries(countries: Iterable[String]): Future[PositiveCasesByCountryAndDates] = {
+    fetchAggregate[PositiveCasesByCountryAndDates](FetchPositiveCasesByCountryAndDates)
+      .map { p =>
+        Option.when(countries.isEmpty)(p).getOrElse(
+          PositiveCasesByCountryAndDates(p.countries.filter { case (country, _) => countries.toSeq.contains(country) }))
+      }
   }
 }
