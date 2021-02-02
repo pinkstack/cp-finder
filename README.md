@@ -1,9 +1,8 @@
 # cp-finder
 
-Ultra-fast search and analytics engine purposely built for
-[Žejn GROUP](https://www.zejn.si/)
-
-- [Codemania (TL - Hack) - hackathon, January 2021](https://tl-hack.incubatehub.com/p/codemania-tl-hack).
+Ultra-fast search and analytics engine purposely built 
+for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack)
+in January 2021.
 
 Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 
