@@ -1,12 +1,12 @@
-# cp-finder
+# cp-finder 🦄
 
-Ultra-fast search and analytics engine purposely 
-built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
+Ultra-fast analytics engine purposely built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
 
 - Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 - GitHub Project Repository - [pinkstack/cp-finder](https://github.com/pinkstack/cp-finder)
+- Author: [Oto Brglez, @otobrglez](https://github.com/otobrglez)
 
-## Concept
+## The concept
 
 In other to achieve incredible speed, performance, responsiveness and scalability I'm proposing that the 
 system for this challenge uses the concepts of [CQRS - Command Query Responsibility Segregation][cqrs] - a 
@@ -16,9 +16,9 @@ With this project I was aiming to address these challenges
 
 * How to have incredibly *fast writes*?
 
-  Akka HTTP framework routes request to internal `PeopleActor`; that actor then internally 
+  [Akka HTTP](https://doc.akka.io/docs/akka-http/current/index.html) framework routes request to internal `PeopleActor`; that actor then internally 
   instantly spawns new child actors. Those child actors then have enough time to process request (in for of commands)
-  before they are written to LevelDB storage.
+  before they are written to [LevelDB](https://github.com/google/leveldb) storage.
   
 * How to have incredibly *fast updates*?
 
@@ -26,20 +26,18 @@ With this project I was aiming to address these challenges
   will hit the live actor or will spawn new one to process the designated command. `PersonActor` is domain
   actor that represents one core entity of the system.
   
-* How to have fast *analytics*?
+* How to have fast endpoints for *analytics*?
 
   `AggregateActor` is another actor that represents effectively the "read side". 
-  Internally it runs "Persistence Query", a query that pulls events/snapshots from LevelDB storage
+  Internally it runs ["Persistence Query"](https://doc.akka.io/docs/akka/current/persistence-query.html), a query that pulls events/snapshots from LevelDB storage
   and in parallel generates "aggregates" for the user to consume. 
   These aggregates are then constantly updated with changes from "write side" as they can be life feed updates.
   So; whenever user is fetching statistics on these analytical endpoints he is reading "in-memory" representation.
 
-* Trade-offs. In other to achieve these incredible results some trade-offs needed to be made. 
-  There is a delay between the time that user writes on "write" side and 
-  to "analytics" side to represent that change. The system follows the so called patterns of "eventual consistency".
+* Trade-offs. In other to achieve these incredible results some trade-offs needed to be made.  There is a delay between the time that user writes on "write" side and to "analytics" side to represent that change. The system follows the so called patterns of ["eventual consistency"](https://en.wikipedia.org/wiki/Eventual_consistency) and [event sourcing](https://martinfowler.com/eaaDev/EventSourcing.html).
 
-![cp-finder.png](./cp-finder.png)
-  
+<img src="./cp-finder.png" alt="cp-finder.png" style="zoom: 25%;" />
+
 ### Benchmarks ⚡️
 
 Although in the real-world these test would be executed with something like [Gatling](https://gatling.io/)
@@ -66,7 +64,7 @@ curl --header "Content-Type: application/json" \
                      ----------
           time_total:  0.017672s
 ```
-  
+
 Fetching the person with `GET`:
 
 ```bash
