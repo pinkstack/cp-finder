@@ -6,12 +6,159 @@ built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackath
 - Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 - GitHub Project Repository - [pinkstack/cp-finder](https://github.com/pinkstack/cp-finder)
 
+## Concept
+
+In other to achieve incredible speed, performance, responsiveness and scalability I'm proposing that the 
+system for this challenge uses the concepts of [CQRS - Command Query Responsibility Segregation][cqrs] - a 
+clear separation of read and write sides of the business domain.
+
+With this project I was aiming to address these challenges
+
+* How to have incredibly *fast writes*?
+
+  Akka HTTP framework routes request to internal `PeopleActor`; that actor then internally 
+  instantly spawns new child actors. Those child actors then have enough time to process request (in for of commands)
+  before they are written to LevelDB storage.
+  
+* How to have incredibly *fast updates*?
+
+  `PeopleActor` keeps `N` number of live persistent `PersonActor`s alive; so any update, change or delete 
+  will hit the live actor or will spawn new one to process the designated command. `PersonActor` is domain
+  actor that represents one core entity of the system.
+  
+* How to have fast *analytics*?
+
+  `AggregateActor` is another actor that represents effectively the "read side". 
+  Internally it runs "Persistence Query", a query that pulls events/snapshots from LevelDB storage
+  and in parallel generates "aggregates" for the user to consume. 
+  These aggregates are then constantly updated with changes from "write side" as they can be life feed updates.
+  So; whenever user is fetching statistics on these analytical endpoints he is reading "in-memory" representation.
+
+* Trade-offs. In other to achieve these incredible results some trade-offs needed to be made. 
+  There is a delay between the time that user writes on "write" side and 
+  to "analytics" side to represent that change. The system follows the so called patterns of "eventual consistency".
+
+![cp-finder.png](./cp-finder.png)
+  
+### Benchmarks ⚡️
+
+Although in the real-world these test would be executed with something like [Gatling](https://gatling.io/)
+to stress test the whole application. I've resulted to `curl` to get some measurements after the system
+has already loaded the whole test CSV file (11000 records).
+
+Creating a person with `POST` on `/people` endpoint:
+
+```bash
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"id":"11000","gender":"M","birthDate":"23.06.1953","isoCountry":"gb","testDate":"1.03.2021","testResult":"P","intervention":"quarantine"}' \
+  -w "@curl-format.txt" \
+  -o /dev/null \
+  -s http://localhost:8080/people
+```
+```
+     time_namelookup:  0.011883s
+        time_connect:  0.012124s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.012156s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.000000s
+                     ----------
+          time_total:  0.017672s
+```
+  
+Fetching the person with `GET`:
+
+```bash
+curl --header "Content-Type: application/json" \
+  -w "@curl-format.txt" \
+  -o /dev/null \
+  -s http://localhost:8080/people/11006
+```
+
+```
+     time_namelookup:  0.004118s
+        time_connect:  0.004303s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.004331s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.005596s
+                     ----------
+          time_total:  0.005677s
+```
+
+The `PATCH` used to update a person via `id` and `JSON` payload
+
+```bash
+curl --header "Content-Type: application/json" \
+  --request PATCH \
+  --data '{"gender":"F","birthDate":"23.06.1953","isoCountry":"gb","testDate":"1.03.2021","testResult":"P","intervention":"quarantine"}' \
+  -w "@curl-format.txt" \
+  -o /dev/null \
+  -s http://localhost:8080/people/11006
+```
+
+```
+     time_namelookup:  0.004437s
+        time_connect:  0.004721s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.004759s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.000000s
+                     ----------
+          time_total:  0.006930s
+```
+
+... and now the **impressive** part, numbers and stats endpoints...
+
+- `GET /analytics/positiveByDates` - all positive cases, grouped by date.
+
+  ```
+     time_namelookup:  0.004067s
+        time_connect:  0.004297s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.004332s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.006747s
+                     ----------
+          time_total:  0.006836s
+  ```
+
+- `GET /analytics/positiveByGenderAndState` - positive cases grouped by the gender and "state"
+
+  ```
+     time_namelookup:  0.004433s
+        time_connect:  0.004663s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.004700s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.006081s
+                     ----------
+          time_total:  0.006171s
+  ```
+
+- `GET /analytics/quarantine` - number of cases, grouped by country and counted by number of time-left in quarantine.
+
+  ```
+     time_namelookup:  0.004133s
+        time_connect:  0.004374s
+     time_appconnect:  0.000000s
+    time_pretransfer:  0.004409s
+       time_redirect:  0.000000s
+  time_starttransfer:  0.005778s
+                     ----------
+          time_total:  0.005875s
+  ```
+
+Fast,... 🐇
+
+[cqrs]: https://martinfowler.com/bliki/CQRS.html
+
 ## Usage 🚀
 
 ### Requirements
 
-The service can run as [fat JAR](https://dzone.com/articles/the-skinny-on-fat-thin-hollow-and-uber)
-on top of any modern JVM or via pre-packaged Docker Image.
+The service can run as `fat JAR` on top of any modern JVM or via pre-packaged Docker Image.
 
 > 🐇 Although out of the scope of the assigment; this project can easily be compiled with GraalVM to
 > also run as "native-image"; that would further reduce memory footprint and
@@ -34,7 +181,7 @@ on top of any modern JVM or via pre-packaged Docker Image.
 ### Running 🏃‍
 
 To run the server please use the following SBT commands, that will spawn the server
-on [http://127.0.0.1:8080](http://127.0.0.1:8080) and put everything online.
+on [http://127.0.0.1:8080](http://127.0.0.1:8080) and put **everything online**.
 
 ```bash
 $ sbt run
@@ -56,9 +203,9 @@ $ java -jar cp-finder.jar
 
 The servers also supports the following environment variables that can be interchangeably
 
-- `PORT=4001` 
-- `JOURNAL_LEVELDB_DIR=tmp/dodo-journal` 
-- `SNAPSHOT_DIR=tmp/dodo-snapshots`
+- `PORT=8080` - HTTP port where the service will listen to.
+- `JOURNAL_LEVELDB_DIR=tmp/journal` - File path for LevelDB embedded storage directory.
+- `SNAPSHOT_DIR=tmp/snapshots` - File path for snapshots storage directory
 
 They can also be passed prior to Java command invocation i.e.:
 
