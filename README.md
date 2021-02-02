@@ -1,8 +1,7 @@
 # cp-finder
 
-Ultra-fast search and analytics engine purposely built for [Žejn GROUP](https://www.zejn.si/)
-- [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack)
-in January 2021.
+Ultra-fast search and analytics engine purposely 
+built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
 
 Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 
@@ -58,7 +57,7 @@ To populate the service with seed data from CSV - the script [bin/feed-csv.rb](b
 
 ### REST API
 
-#### CRUD
+#### CRUD 🚜
 
 ##### Creating a person
 
@@ -105,7 +104,7 @@ Content-Type: application/json
 DELETE http://127.0.0.1:8080/people/42
 ```
 
-#### Analytics
+#### Analytics 📈
 
 ##### Number of positive test cases
 
