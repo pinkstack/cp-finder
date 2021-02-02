@@ -1,6 +1,6 @@
 # cp-finder 🦄
 
-Ultra-fast analytics engine purposely built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
+Ultra-fast search and analytics engine purposely built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
 
 - Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 - GitHub Project Repository - [pinkstack/cp-finder](https://github.com/pinkstack/cp-finder)
