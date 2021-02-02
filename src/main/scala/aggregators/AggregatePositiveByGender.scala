@@ -9,7 +9,7 @@ object AggregatePositiveByGender {
   type Female = Int
   type Agg = (Male, Female)
 
-  def apply(callback: Domain.PositiveCasesByGender => Unit): Sink[Domain.Person, NotUsed] = {
+  def apply(callback: Domain.PositiveCasesByGender => Unit): Sink[Domain.Person, NotUsed] =
     Flow[Domain.Person]
       .filter(_.positive)
       .fold[Agg]((0, 0)) { case ((aggMale, aggFemale), person: Domain.Person) =>
@@ -20,5 +20,4 @@ object AggregatePositiveByGender {
       }
       .map { case (male, female) => Domain.PositiveCasesByGender(male, female) }
       .to(Sink.foreach(wrap => callback(wrap)))
-  }
 }

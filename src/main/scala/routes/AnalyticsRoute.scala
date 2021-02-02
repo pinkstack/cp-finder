@@ -22,20 +22,22 @@ class AnalyticsRoute(aggregateActor: ActorRef)(implicit system: ActorSystem) {
   import Serialisation.LocalDateSerde._
   import system.dispatcher
 
-  implicit val timeout: Timeout = 2.second
+  implicit val timeout: Timeout = 6.second
 
-  val route: Route = pathPrefix("analytics")(concat(
-    get(
-      concat(
-        path("positive")(complete(fetchAggregate[PositiveCases](FetchPositiveCases))),
-        path("positiveByGender")(complete(fetchAggregate[PositiveCasesByGender](FetchPositiveCasesByGender))),
-        path("positiveByGenderAndState")(complete(fetchAggregate[PositiveCasesByGenderAndState](FetchPositiveCasesByGenderAndState))),
-        path("positiveByDates")(complete(fetchAggregate[PositiveCasesByDates](FetchPositiveCasesByDates))),
-        path("positiveByCountryAndDates") {
-          parameter(Symbol("country").as[String].*) { countries: Iterable[String] => complete(filterCountries(countries)) }
-        }
-      )
-    )))
+  val route: Route = pathPrefix("analytics")(concat(get(
+    concat(
+      path("positive")(complete(fetchAggregate[PositiveCases](FetchPositiveCases))),
+      path("positiveByGender")(complete(fetchAggregate[PositiveCasesByGender](FetchPositiveCasesByGender))),
+      path("positiveByGenderAndState")(complete(fetchAggregate[PositiveCasesByGenderAndState](FetchPositiveCasesByGenderAndState))),
+      path("positiveByDates")(complete(fetchAggregate[PositiveCasesByDates](FetchPositiveCasesByDates))),
+      path("positiveByCountryAndDates") {
+        parameter(Symbol("country").as[String].*) { countries: Iterable[String] => complete(filterCountries(countries)) }
+      },
+      path("quarantine") {
+        complete(fetchAggregate[QuarantineCasesByCountryAndDuration](FetchQuarantineCasesByCountryAndDuration))
+      }
+    )
+  )))
 
   private[this] def fetchAggregate[T: ClassTag](aggregate: Domain.FetchAggregate): Future[T] = {
     (aggregateActor ? AggregateActor.GetAggregate(aggregate)).mapTo[T]

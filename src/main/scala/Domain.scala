@@ -1,7 +1,9 @@
 package com.pinkstack
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import scala.collection.SortedMap
+import scala.concurrent.duration._
 
 object Domain {
 
@@ -60,6 +62,16 @@ object Domain {
                           intervention: String) extends PersonState with CborSerializable {
     def positive: Boolean = testResult == "P"
 
+    def quarantine: Boolean = intervention == "quarantine"
+
+    def stillInQuarantine: Boolean = quarantine && quarantineDaysLeft >= 0
+
+    def quarantineEnd: LocalDate = testDate.plusDays(14)
+
+    def quarantineDaysLeft: Long = ChronoUnit.DAYS.between(LocalDate.now(), quarantineEnd)
+
+    def quarantineDaysLeftKey: String = quarantineDaysLeft.toString
+
     def male: Boolean = gender == 'M'
 
     def female: Boolean = !male
@@ -82,7 +94,11 @@ object Domain {
 
   case class PositiveCasesByDates(dates: SortedMap[LocalDate, Int] = SortedMap.empty) extends AggregateResult
 
-  case class PositiveCasesByCountryAndDates(countries: Map[String, SortedMap[LocalDate, Int]] = Map.empty) extends AggregateResult
+  case class PositiveCasesByCountryAndDates(countries: Map[String, SortedMap[LocalDate, Int]] = Map.empty)
+    extends AggregateResult
+
+  case class QuarantineCasesByCountryAndDuration(countries: Map[String, SortedMap[String, Int]] = Map.empty)
+    extends AggregateResult
 
   sealed trait FetchAggregate
 
@@ -95,5 +111,7 @@ object Domain {
   case object FetchPositiveCasesByDates extends FetchAggregate
 
   case object FetchPositiveCasesByCountryAndDates extends FetchAggregate
+
+  case object FetchQuarantineCasesByCountryAndDuration extends FetchAggregate
 
 }

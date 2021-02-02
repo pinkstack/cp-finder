@@ -10,7 +10,7 @@ import java.time.LocalDate
 import scala.collection.SortedMap
 
 object AggregatePositiveCasesByDates {
-  def apply(callback: Domain.PositiveCasesByDates => Unit): Sink[Person, NotUsed] = {
+  def apply(callback: Domain.PositiveCasesByDates => Unit): Sink[Person, NotUsed] =
     Flow[Person]
       .filter(_.positive)
       .fold(SortedMap.empty[LocalDate, Int]) { case (agg, person: Person) =>
@@ -18,6 +18,5 @@ object AggregatePositiveCasesByDates {
       }
       .map(sum => Domain.PositiveCasesByDates(sum))
       .to(Sink.foreach(wrap => callback(wrap)))
-  }
 }
 

@@ -1,13 +1,14 @@
 package com.pinkstack
 package actors
 
-import aggregators.{AggregatePositive, AggregatePositiveByGender, AggregatePositiveCasesByCountryAndDates, AggregatePositiveCasesByDates, AggregatePositiveCasesByGenderAndState}
+import aggregators.{AggregatePositive, AggregatePositiveByGender, AggregatePositiveCasesByCountryAndDates, AggregatePositiveCasesByDates, AggregatePositiveCasesByGenderAndState, AggregateQuarantineCasesByCountryAndDuration}
 
 import akka.NotUsed
 import akka.actor._
 import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 import akka.persistence.query.{EventEnvelope, PersistenceQuery}
 import akka.stream.scaladsl._
+import com.pinkstack.Domain.QuarantineCasesByCountryAndDuration
 
 class AggregateActor extends Actor with ActorLogging {
 
@@ -25,6 +26,7 @@ class AggregateActor extends Actor with ActorLogging {
   var aggregatedPositiveCasesByGenderAndState: PositiveCasesByGenderAndState = PositiveCasesByGenderAndState()
   var aggregatedPositiveCasesByDates: PositiveCasesByDates = PositiveCasesByDates()
   var aggregatedPositiveCasesByCountryAndDates: PositiveCasesByCountryAndDates = PositiveCasesByCountryAndDates()
+  var aggregatedQuarantineCasesByCountryAndDuration: QuarantineCasesByCountryAndDuration = QuarantineCasesByCountryAndDuration()
 
   context.system.scheduler.scheduleWithFixedDelay(0.seconds, 5.seconds, self, Tick)
 
@@ -47,6 +49,9 @@ class AggregateActor extends Actor with ActorLogging {
     case Aggregated(result: PositiveCasesByCountryAndDates) =>
       aggregatedPositiveCasesByCountryAndDates = result
 
+    case Aggregated(result: QuarantineCasesByCountryAndDuration) =>
+      aggregatedQuarantineCasesByCountryAndDuration = result
+
     case GetAggregate(FetchPositiveCases) =>
       sender() ! aggregatedPositiveCases
 
@@ -61,6 +66,9 @@ class AggregateActor extends Actor with ActorLogging {
 
     case GetAggregate(FetchPositiveCasesByCountryAndDates) =>
       sender() ! aggregatedPositiveCasesByCountryAndDates
+
+    case GetAggregate(FetchQuarantineCasesByCountryAndDuration) =>
+      sender() ! aggregatedQuarantineCasesByCountryAndDuration
   }
 
   private[this] val queries: LeveldbReadJournal = PersistenceQuery(context.system)
@@ -94,6 +102,7 @@ class AggregateActor extends Actor with ActorLogging {
       .alsoTo(AggregatePositiveCasesByGenderAndState.apply(self ! Aggregated(_)))
       .alsoTo(AggregatePositiveCasesByDates.apply(self ! Aggregated(_)))
       .alsoTo(AggregatePositiveCasesByCountryAndDates.apply(self ! Aggregated(_)))
+      .alsoTo(AggregateQuarantineCasesByCountryAndDuration.apply(self ! Aggregated(_)))
       .runWith(Sink.ignore)
   }
 

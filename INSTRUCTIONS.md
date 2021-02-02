@@ -51,6 +51,7 @@ Ideally, one would just run the service.
 - Improve the previous endpoint to support filter the data based on the amount left in quarantine. 
   So the endpoint should include the minimum number of days left in quarantine.
 
+> 14 dni?
 
 ### Evaluation criteria
 - Size of the solution
@@ -58,4 +59,7 @@ Ideally, one would just run the service.
 - Coding principles used
 - Unit and Integration tests with performance measures
 
-COVIDPeople data: https://drive.google.com/file/d/1yM23HHHfwbjvZKW3-xjUSUbPQMEhaUmd/view?usp=sharing
+
+## Extras
+
+- COVIDPeople data: https://drive.google.com/file/d/1yM23HHHfwbjvZKW3-xjUSUbPQMEhaUmd/view?usp=sharing

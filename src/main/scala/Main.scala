@@ -9,6 +9,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.StdIn
 import scala.util.{Failure, Success}
 
 object Main extends {
@@ -39,6 +40,8 @@ object Main extends {
     }
 
     startServer(routes)
+    StdIn.readLine()
+    system.terminate()
   }
 }
 

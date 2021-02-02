@@ -1,7 +1,7 @@
 # cp-finder
 
-Ultra-fast search and analytics engine purposely built 
-for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack)
+Ultra-fast search and analytics engine purposely built for [Žejn GROUP](https://www.zejn.si/)
+- [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack)
 in January 2021.
 
 Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
@@ -13,8 +13,8 @@ Detailed competition requirements and instructions can be found in [INSTRUCTIONS
 The service can run as [fat JAR](https://dzone.com/articles/the-skinny-on-fat-thin-hollow-and-uber)
 on top of any modern JVM or via pre-packaged Docker Image.
 
-> 🐇 Although out of the scope of the assigment; this project can easily be compiled with GraalVM to 
-> also run as "native-image"; that would further reduce memory footprint and 
+> 🐇 Although out of the scope of the assigment; this project can easily be compiled with GraalVM to
+> also run as "native-image"; that would further reduce memory footprint and
 > improve boot-up time and possibly performance.
 
 ## Development 🏗
@@ -209,10 +209,38 @@ GET http://127.0.0.1:8080/analytics/positiveByCountryAndDates
       ...
 ```
 
+###### Number of individuals currently in the quarantine
+
+This endpoint is to be used for following requirements:
+
+- The number of individuals currently in the quarantine.
+- Results are grouped by country
+- Filtering is set to only show cases that are quarantined
+- Time of quarantine is set to 14 days.
+- The response is "live" and changes as time passes by...
+
 With the help of `country` query parameters the results can be further filtered.
 
 ```http request
-GET http://127.0.0.1:8080/analytics/positiveByCountryAndDates?country=svn&country=aus
+GET http://127.0.0.1:8080/analytics/quarantine
+```
+
+```json
+{
+  "countries": {
+    "aus": {
+      "0": 3,
+      "1": 2,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 1,
+      "6": 1,
+      "7": 3,
+      "8": 1,
+      ...
+  }
+}
 ```
 
 ## Author

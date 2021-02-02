@@ -15,7 +15,7 @@ object AggregatePositiveCasesByGenderAndState {
   type Count = Int
   type Agg = (Map[Male, Count], Map[Male, Count])
 
-  def apply(callback: Domain.PositiveCasesByGenderAndState => Unit): Sink[Person, NotUsed] = {
+  def apply(callback: Domain.PositiveCasesByGenderAndState => Unit): Sink[Person, NotUsed] =
     Flow[Domain.Person]
       .filter(person => person.positive && person.hadIntervention)
       .fold[Agg]((Map.empty[Male, Count], Map.empty[Female, Count])) {
@@ -27,5 +27,4 @@ object AggregatePositiveCasesByGenderAndState {
       }
       .map { case (male, female) => PositiveCasesByGenderAndState(male, female) }
       .to(Sink.foreach(callback(_)))
-  }
 }

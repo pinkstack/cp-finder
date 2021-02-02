@@ -14,7 +14,7 @@ object AggregatePositiveCasesByCountryAndDates {
   type TestDate = LocalDate
   type Count = Int
 
-  def apply(callback: Domain.PositiveCasesByCountryAndDates => Unit): Sink[Person, NotUsed] = {
+  def apply(callback: Domain.PositiveCasesByCountryAndDates => Unit): Sink[Person, NotUsed] =
     Flow[Person]
       .filter(_.positive)
       .fold(Map.empty[Country, SortedMap[TestDate, Count]]) {
@@ -27,6 +27,5 @@ object AggregatePositiveCasesByCountryAndDates {
       }
       .map(sum => Domain.PositiveCasesByCountryAndDates(sum))
       .to(Sink.foreach(wrap => callback(wrap)))
-  }
 }
 
