@@ -14,3 +14,26 @@ libraryDependencies ++= {
     Dependencies.logging ++
     Dependencies.testing
 }
+
+mainClass in assembly := Some("com.pinkstack.Main")
+assemblyJarName in assembly := "cp-finder.jar"
+
+assemblyMergeStrategy in assembly := {
+  case "module-info.class" => MergeStrategy.discard
+  case x                   =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
+assemblyOutputPath in assembly := file("cp-finder.jar")
+
+scalacOptions ++= Seq(
+  "-encoding", "UTF-8",
+  "-feature",
+  "-explaintypes",
+  "-unchecked",
+  "-language:implicitConversions",
+  "-language:higherKinds",
+  "-language:postfixOps",
+  "-Yrangepos",
+  "-target:11"
+)

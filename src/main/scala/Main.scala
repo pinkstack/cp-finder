@@ -13,13 +13,15 @@ import scala.io.StdIn
 import scala.util.{Failure, Success}
 
 object Main extends {
+  private def port: Int = scala.util.Properties.envOrElse("PORT", "8080").toInt
+
   def startServer(routes: Route)(implicit system: ActorSystem): Unit = {
-    val f = Http().newServerAt("0.0.0.0", port = 8080).bind(routes)
+    val f = Http().newServerAt("0.0.0.0", port = port).bind(routes)
 
     f.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
-        system.log.info(Banner.showBanner(address.getHostString, address.getPort))
+        system.log.info(Banner.showBanner(address.getHostString, port))
         system.log.info("Server at http://{}:{}/", address.getHostString, address.getPort)
       case Failure(exception) =>
         system.log.error("Failed to bind HTTP endpoint, terminating system", exception)

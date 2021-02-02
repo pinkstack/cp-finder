@@ -3,7 +3,8 @@
 Ultra-fast search and analytics engine purposely 
 built for [Žejn GROUP](https://www.zejn.si/) - [Codemania (TL - Hack) - hackathon](https://tl-hack.incubatehub.com/p/codemania-tl-hack) in January 2021.
 
-Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
+- Detailed competition requirements and instructions can be found in [INSTRUCTIONS.md](INSTRUCTIONS.md).
+- GitHub Project Repository - [pinkstack/cp-finder](https://github.com/pinkstack/cp-finder)
 
 ## Usage 🚀
 
@@ -32,11 +33,37 @@ on top of any modern JVM or via pre-packaged Docker Image.
 
 ### Running 🏃‍
 
-To compile and run the server please use the following SBT commands, that will spawn the server
+To run the server please use the following SBT commands, that will spawn the server
 on [http://127.0.0.1:8080](http://127.0.0.1:8080) and put everything online.
 
 ```bash
 $ sbt run
+```
+
+### Compilation
+
+To compile the project into `fat JAR` invoke `assembly` task
+
+```bash
+$ sbt assembly
+```
+
+The assembly task will compile everything and build a jar that can be invoked like so from the root of the project
+
+```bash
+$ java -jar cp-finder.jar
+```
+
+The servers also supports the following environment variables that can be interchangeably
+
+- `PORT=4001` 
+- `JOURNAL_LEVELDB_DIR=tmp/dodo-journal` 
+- `SNAPSHOT_DIR=tmp/dodo-snapshots`
+
+They can also be passed prior to Java command invocation i.e.:
+
+```bash
+$ PORT=3030 java -jar cp-finder.jar
 ```
 
 ### Testsuite

@@ -17,3 +17,5 @@ tmp/
 !tmp/.gitkeep
 
 requests/http-client.env.json
+
+*.jar

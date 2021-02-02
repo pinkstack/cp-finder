@@ -20,7 +20,7 @@ object Dependencies {
     "de.heikoseeberger" %% "akka-http-circe" % "1.34.0",
 
     // LevelDB
-    "org.iq80.leveldb" % "leveldb" % "0.12",
+    // "org.iq80.leveldb" % "leveldb" % "0.12",
     "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8"
   )
 
