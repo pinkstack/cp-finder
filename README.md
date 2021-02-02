@@ -12,9 +12,50 @@ Detailed competition requirements and instructions can be found in [INSTRUCTIONS
 ### Requirements
 
 The service can run as [fat JAR](https://dzone.com/articles/the-skinny-on-fat-thin-hollow-and-uber)
-on top of any modern JRE or via pre-packaged Docker Image.
+on top of any modern JVM or via pre-packaged Docker Image.
 
-> 🐇 Although out of the scope of the assigment; this project can easily be compiled with GraalVM to also run as "native-image"; that would further reduce memory footprint and improve boot-up time and possibly performance.
+> 🐇 Although out of the scope of the assigment; this project can easily be compiled with GraalVM to 
+> also run as "native-image"; that would further reduce memory footprint and 
+> improve boot-up time and possibly performance.
+
+## Development 🏗
+
+### Requirements
+
+- Install any modern JDK, although it is suggested to use [SDKMAN](https://sdkman.io/) with OpenJDK (14).
+
+    - Development was done on `openjdk version "14.0.2" 2020-07-14`
+
+- [Install Scala](https://docs.scala-lang.org/getting-started/index.html) with
+  [Scala Built Tool (SBT)](https://www.scala-sbt.org/download.html)
+
+    - Scala version used `2.13.4`
+    - SBT version used `1.4.6`
+
+### Running 🏃‍
+
+To compile and run the server please use the following SBT commands, that will spawn the server
+on [http://127.0.0.1:8080](http://127.0.0.1:8080) and put everything online.
+
+```bash
+$ sbt run
+```
+
+### Testsuite
+
+To run the full testsuite including integration tests please run
+
+```bash
+$ sbt test
+```
+
+### Tooling 🛠
+
+To populate the service with seed data from CSV - the script [bin/feed-csv.rb](bin/feed-csv.rb) can be used like so:
+
+```bash
+./bin/feed-csv.rb data/covidPeople.csv
+```
 
 ### REST API
 
@@ -173,41 +214,6 @@ With the help of `country` query parameters the results can be further filtered.
 
 ```http request
 GET http://127.0.0.1:8080/analytics/positiveByCountryAndDates?country=svn&country=aus
-```
-
-## Development 🏗
-
-### Requirements
-
-- Install any modern JDK, although it is suggested to use [SDKMAN](https://sdkman.io/) with OpenJDK (14).
-
-    - Development was done on `openjdk version "14.0.2" 2020-07-14`
-
-- [Install Scala](https://docs.scala-lang.org/getting-started/index.html) with
-  [Scala Built Tool (SBT)](https://www.scala-sbt.org/download.html)
-
-    - Scala version used `2.13.4`
-    - SBT version used `1.4.6`
-
-### Running 🏃‍
-
-To compile and run the server please use the following SBT commands, that will spawn the server
-on [http://127.0.0.1:8080](http://127.0.0.1:8080) and put everything online.
-
-$ sbt run
-
-### Testsuite
-
-To run the full testsuite including integration tests please run
-
-$ sbt test
-
-### Tooling
-
-To populate the service with seed data from CSV the script [bin/feed-csv.rb](bin/feed-csv.rb) can be used like so:
-
-```bash
-./bin/feed-csv.rb data/covidPeople.csv
 ```
 
 ## Author
