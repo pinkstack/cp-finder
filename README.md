@@ -31,7 +31,7 @@ With this project I was aiming to address these challenges
   `AggregateActor` is another actor that represents effectively the "read side". 
   Internally it runs ["Persistence Query"](https://doc.akka.io/docs/akka/current/persistence-query.html), a query that pulls events/snapshots from LevelDB storage
   and in parallel generates "aggregates" for the user to consume. 
-  These aggregates are then constantly updated with changes from "write side" as they can be life feed updates.
+  These aggregates are then constantly updated with changes from "write side" as they can be live feed updates.
   So; whenever user is fetching statistics on these analytical endpoints he is reading "in-memory" representation.
 
 * Trade-offs. In other to achieve these incredible results some trade-offs needed to be made.  There is a delay between the time that user writes on "write" side and to "analytics" side to represent that change. The system follows the so called patterns of ["eventual consistency"](https://en.wikipedia.org/wiki/Eventual_consistency) and [event sourcing](https://martinfowler.com/eaaDev/EventSourcing.html).
